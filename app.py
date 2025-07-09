@@ -21,6 +21,7 @@ def forecast():
 
 @app.route('/forecast', methods=['GET'])
 def get_forecast():
+    print("GET /forecast was called!")  # Debug print
     df = pd.read_csv('Harvest.csv')
     data = df.to_dict(orient='records')
     return jsonify({"forecast": data})
