@@ -4,11 +4,9 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Load your model and encoder
 model = joblib.load("harvest_model.pkl")
 encoder = joblib.load("encoder.pkl")
 
-# POST endpoint for single forecast (already present)
 @app.route('/forecast', methods=['POST'])
 def forecast():
     data = request.json
@@ -16,7 +14,6 @@ def forecast():
     input_df = pd.DataFrame([data])
     input_df['Month'] = pd.to_datetime(input_df['Month'], format='%B').dt.month
 
-    # Use only the columns expected by the encoder
     encoder_columns = list(encoder.feature_names_in_)
     input_df = input_df[encoder_columns]
 
@@ -24,10 +21,9 @@ def forecast():
     prediction = model.predict(input_encoded)[0]
     return jsonify({"forecast": round(prediction, 2)})
 
-# NEW: GET endpoint for all forecast data (for your frontend)
+# THIS IS THE CRITICAL PART:
 @app.route('/forecast', methods=['GET'])
 def get_forecast():
-    # Example static data, replace with your real data if needed
     data = {
         "forecast": [
             {"crop": "rice", "year": 2026, "yield": 602},
@@ -38,7 +34,6 @@ def get_forecast():
     }
     return jsonify(data)
 
-# Root endpoint for status
 @app.route('/')
 def home():
     return "Harvest Forecast API is running!"
